@@ -1,0 +1,59 @@
+Problem 2.1
+
+Suppose that we have a multiprogrammed computer in which each job has identical characteristics. In one computation period, T, for a job, half the time is spent in I/O and the other half in processor activity. Each job runs for a total of N periods. Assume that a simple round-robin scheduling is used, and that I/O operations can overlap with processor operation. Define the following quantities:
+ 	Turnaround time = actual time to complete a job
+ 	Throughput = average number of jobs completed per time period T
+ 	Processor utilization = percentage of time that the processor is active (not waiting)
+
+Compute these quantities for one, two, and four simultaneous jobs, assuming that the period T is distributed in each of the following ways:
+
+** Note: I wasn't sure how exactly to answer this question; I answered the parts based on what I thought was correct.
+
+	a. I/O first half, processor second half
+		- one job - runs for N periods
+			+ Turnaround time = (N * t) /2
+			+ Throughput = N jobs / 2t
+			+ Processor utilization = 50% (spend half time with I/O and half time with processor)
+
+		- two simultaneous jobs
+			+ Turnaround time = N * t
+			+ Throughput = N jobs /time t
+			+ Processor utilization = 100% (the processor will always be active with 2 jobs)
+
+		- four simultaneous jobs
+			+ Turnaround time = 2 * N * t
+			+ Throughput = 2N jobs / time t
+			+ Processor utilization = 100% (the processor will always be active with 4 jobs)
+
+	b. I/O first and fourth quarters, processor second and third quarter
+		- one job - runs for N periods
+			+ Turnaround time = .25NT
+			+ Throughput = 4N jobs / time t
+			+ Processor utilization = 50% (spend half time with I/O and half time with processor)
+
+		- two simultaneous jobs
+			+ Turnaround time = (Nt + .25(Nt))
+			+ Throughput = 2N jobs / time t
+			+ Processor utilization = 100% (the processor will always be active with 2 jobs)
+
+		- four simultaneous jobs
+			+ Turnaround time = (.25NT + .25NT)
+			+ Throughput = N jobs / time t
+			+ Processor utilization = 100% (the processor will always be active with 4 jobs)
+
+
+Problem 2.2
+
+An I/O-bound program is one that, if run alone, would spend more time waiting for I/O than using the processor. A processor-bound program is the opposite. Suppose a short-term scheduling algorithm favors those programs that have used little processor time in the recent past. Explain why this algorithm favors I/O-bound programs and yet does not permanently deny processor time to processor-bound programs.
+	If the algorithm favors programs that use little processor time, I/O bound programs spend most the time idle while they wait for I/O (as explained above). Since I/O bound programs spend more time waiting rather than using the processor, they will be favored per the algorithm. Even though I/O bound is favored, the algorithm does not completely ignore a processor-bound program. This is the case because at a certain point, the I/O bound program will use the processor to complete the task, and when this occurs the most recent past will show that the I/O bound program used more processor time, thus favoring the processor-bound program. This will continue in a cycle occasionally giving the processor-bound program a chance to run.
+
+
+Written #2
+
+Most hardware architectures provide an instruction to return from an interrupt, such as iret. This instruction switches the mode of operation from kernel-mode to user-mode. Explain what happens if an application program executes this instruction.
+	-An application program would not be allowed to use an iret without the correct permissions. Using iret switches from protected kernel mode to user mode, and would require an exception since application typically don’t hold the permissions that the hardware architecture would. 
+
+Written #3
+
+In your own words, explain the steps that an OS goes through when the CPU receives an interrupt.
+	-When the CPU receives an interrupt, the OS saves the address at which the interrupt originally occurred so it can go back to that address after the interrupt has been handled. Similarly, all registers are stored onto the stack so the contents are not lost. The interrupt is then executed and handles the instructions depending on what was needed. After the interrupt has finished everything is pulled back onto the registers from the stack, and the program counter returns to it’s original location that was saved prior to starting to continue the next instruction in the program.

@@ -1,0 +1,125 @@
+1. Describe the program you measured. What did you originally write it for, and what was it meant to accomplish?
+	-The program is measuring the execution time for assignment 1 from COMP15. This program explored dynamic arrays and allowed the user to insert, and delete elements from the array as simulated through a deck of cards. When running the program, it essentially lists how many cards are in the hand - and proceeds to remove each card from the list one-by-one until there are no cards remaining.
+
+2. Summarize the five metrics (utime, stime, cutime, cstime, wall-clock time) you were measuring. What do these measurements mean, how are they different, and why are they important?
+	-Utime is measuring the User CPU time - which is how long the program spends being executed in user space.
+	-Stime is measuring the system CPU time - which is how long the operating systems takes to execute the program
+	-CUtime is measuring the CPU time of the child processes that were terminated i.e. how long the child progress took
+	-CStime is measuring the system CPU time of the child processes that were terminated i.e. how long the parent process took
+	-Wall-clock time is measuring how long the program executed using standard timing from the computer
+
+	These measurements are each distinguishing how long the program spends in both the User space (User CPU time) and the Kernel space (System CPU time). These metrics are significant because it’s measuring how long it takes the processor to execute the actual code written (User space), and how long it takes the Operating System to actually run / complete the code (Kernel space).
+
+
+3. The results you saw (utime, stime, cutime, cstime, wall-clock time) from at least three runs of your program on the same executable. These results must be non-trivial (i.e., something other than all zeroes).
+	Results:
+
+Child process - going to execute program
+Cards in hand: 0
+Cards in hand: 1
+Cards in hand: 2
+Cards in hand: 3
+Cards in hand: 4
+Cards in hand: 5
+4H,9C,2C,5S,TH,AD
+Cards in hand: 6
+Removed 9C
+4H,2C,5S,TH,AD
+Cards in hand: 5
+Removed 4H
+2C,5S,TH,AD
+Cards in hand: 4
+Removed AD
+2C,5S,TH
+Cards in hand: 3
+Removed 5S
+2C,TH
+Cards in hand: 2
+Removed TH
+2C
+Cards in hand: 1
+Removed 2C
+Cards in hand: 0
+parent process - waiting for child to finish
+Child process terminated normally
+FINAL Timing analysis:   utime  0       stime  18      cutime  267      cstime  141        wallclock 690
+
+
+parent process - waiting for child to finish
+Child process terminated normally
+Child process - going to execute program
+Cards in hand: 0
+Cards in hand: 1
+Cards in hand: 2
+Cards in hand: 3
+Cards in hand: 4
+Cards in hand: 5
+4H,9C,2C,5S,TH,AD
+Cards in hand: 6
+Removed 9C
+4H,2C,5S,TH,AD
+Cards in hand: 5
+Removed 4H
+2C,5S,TH,AD
+Cards in hand: 4
+Removed AD
+2C,5S,TH
+Cards in hand: 3
+Removed 5S
+2C,TH
+Cards in hand: 2
+Removed TH
+2C
+Cards in hand: 1
+Removed 2C
+Cards in hand: 0
+parent process - waiting for child to finish
+Child process terminated normally
+FINAL Timing analysis:   utime  1       stime  18      cutime  276      cstime  158        wallclock 731
+
+
+parent process - waiting for child to finish
+Child process terminated normally
+Child process - going to execute program
+Cards in hand: 0
+Cards in hand: 1
+Cards in hand: 2
+Cards in hand: 3
+Cards in hand: 4
+Cards in hand: 5
+4H,9C,2C,5S,TH,AD
+Cards in hand: 6
+Removed 9C
+4H,2C,5S,TH,AD
+Cards in hand: 5
+Removed 4H
+2C,5S,TH,AD
+Cards in hand: 4
+Removed AD
+2C,5S,TH
+Cards in hand: 3
+Removed 5S
+2C,TH
+Cards in hand: 2
+Removed TH
+2C
+Cards in hand: 1
+Removed 2C
+Cards in hand: 0
+parent process - waiting for child to finish
+Child process terminated normally
+FINAL Timing analysis:   utime  1       stime  18      cutime  285      cstime  154        wallclock 715
+
+Analysis: The timings shown above illustrate utime being very low (and zero in the first  case), this is explained further in question 4, however the parent time is farily low compared to the child because the child is the one that is actually executing the program. The other metrics are all generally close in numbers, which shows consitency when the program is being run. The cutime (child user time) and cstime (child system time) show that the program spends more time in the user space than it does in the system space. This could be due to the nature of the program, where it requires more libraries/statements printed/ete in relation to the operating system (kernel space).
+
+
+4. Adjustments you had to make in your source code: varying the number of child processes you forked, swapping in different programs to measure, etc.
+	I had to adjust the number of forks I did, as well as test with a different program that was more complex. Originally, I was using a simple program that was showing trivial timing analyses and only printed one line to the console. In order to better collect how much time was spend for each execution, I put in a for loop that would allow the timing to be non trivial since multiple would be running. The loop runs 1,000 times to better collect the data needed.
+	When I originally tried to solve the problem, I was also outputting in the incorrect format - with my printf  I declared the times as floats, rather than jd. When I changed this, the times were very large numbers, and I revised the code once again. The second change that was made was placing the start and end times in the correct location in the code. They were originally incrementing with each process (i.e. start_time = start_time + times(&st_cpu) and thus it was larger than expected. Once these were fixed, the outputs listed above were outputted, and were more reasonable numbers.
+
+
+5. Was user/system time greater or smaller than child user/system time? Explain the differences you saw between parent and child.
+	The user/system time was significantly smaller than child user/system time. The parent user/system time was seen to constantly be a smaller number because the parent is simply being forked, and the child is what is actually executing the program specified in the command line. Thus the children all run the program various time (1000 in my program), and therefore take more time to run.
+
+6. If you add up all 4 of your system/user times, do they sum to the total wall-clock time? Why or why not?
+	No you do not get total wall-clock time. The wall clock is the elapsed time taken to run the program based on the internal clock of the computer. The wall-clock is independent of the CPU time because it encompasses other factors - such as waiting for the CPU to start up. There is also an element where the wall clock includes idle time when it’s waiting for other factors (such as I/O devices), and is divided up between other processes.

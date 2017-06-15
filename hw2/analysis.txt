@@ -1,0 +1,76 @@
+Explain the difference (if any) between the time required by your procedure calls and the getpid() system call by discussing what work each call must do.
+	Depending on the complexity of the procedure call it takes less time to execute than the getpid() system call takes. The reason the system calls take longer than procedure calls is because the system call must go to the kernel. In order to do this, an interrupt must be called and handled. By executing an interrupt, there is more instructions that need to be handled, and registers that need to be saved prior to actually executing the function. Thus we see the pattern that the simple system call takes about twice as long as the simple procedure call. Because system calls must switch from user space to kernel space, there is a longer execution time for system calls.
+
+
+
+Explain the evolution of your procedures. How did you build them up to take a similar amount of time as the procedure call?
+
+	I wrote three procedure calls and timed each one to compare it to the system call. The first function called nothing() simply returns 0. The timing analysis for this function illustrates that it is nearly twice as fast as the getpid() system call. The second function is similar to the first, just slightly more complex since it performs a multiplication. This procedure call is takes ~1 nanosecond longer than the first call, but still relatively fast compared to the getpid() system call time. The third procedure call is one that I modified several times to get different results. The first version of this function creates an array of 4 elements. The first iteration I run I printed out the contents of the array. Since the program iterates a million times, this was incredibly long, which is reflected in the average timing analysis. The timing analyses for each scenario can be found below. The second version simply took every element and set it equal to zero. In this version, the timing for the procedure call was still ~6 nanoseconds longer than the getpid() system call. The third iteration of the function took the original length of the array that was created and changed it from 4 to 2 elements. The array set all elements = 0 for a million iterations. This function was the closest to the getpid() time. They differed by ~ 1 microsecond.
+
+Timing analysis:
+
+Function 3: When printing all the elements in the array of size 4 a million times each function - in this scenario we can see that the procedure call took significantly longer than getpid(). This is because the function is printing every element within a loop - the nested loop makes this call very expensive.
+Trial 1
+	average function call 1  5.935000     
+	average function call 2  6.736000     
+	average function call 3  9141.972656     
+	average system call pid time 11.175000 
+
+Trial 2
+	average function call 1  5.918000     
+	average function call 2  6.879000     
+	average function call 3  8926.779297     
+	average system call pid time 11.153000
+
+Trial 3
+	average function call 1  5.909000     
+	average function call 2  6.737000     
+	average function call 3  9090.944336     
+	average system call pid time 11.456000 
+
+
+
+Function 3: Set each element in array of size 4 equal to 0 a million times each - in this scenario the line to print every element was commented out. We can see that it is significantly faster, however setting 4 elements = 0 a million times each is still taking longer than the getpid() system call.
+
+Trial 1
+	average function call 1  6.782000     
+	average function call 2  6.133000     
+	average function call 3  17.489000     
+	average system call pid time 11.836000 
+
+Trial 2
+	average function call 1  6.738000     
+	average function call 2  6.128000     
+	average function call 3  17.440001     
+	average system call pid time 11.856000
+
+Trial 3
+	average function call 1  6.755000     
+	average function call 2  6.256000     
+	average function call 3  17.422001     
+	average system call pid time 11.797000
+
+
+Function 3: Changed the array length from 4 elements to 2 elements; still setting each element = 0 - this scenario is the closest timing between a function call and the getpid() call. This shows the two system and procedure calls on par timing wise, however in this case getpid is one line, versus array() is looping through elements and setting them to other values. While the times are the same, to the user at least, it appears that the system call is doing more “work” than getpid(). We know this isn’t true based on what was explained above, where getpid() has to execute an interrupt and move into kernel space, but this is something that isn’t visibly obvious to the user.
+
+Trial 1
+	average function call 1  5.941000
+	average function call 2  6.744000     
+	average function call 3  9.753000     
+	average system call pid time 10.946000
+
+Trial 2
+	average function call 1  5.910000     
+	average function call 2  6.733000     
+	average function call 3  9.569000     
+	average system call pid time 10.939000
+
+Trial 3
+	average function call 1  5.928000     
+	average function call 2  6.735000     
+	average function call 3  9.651000     
+	average system call pid time 10.948000
+
+
+Why is a  system call is expected to be significantly more expensive than a procedure call, when they are doing basically the same workload?
+	As explained above, the system calls movement between spaces is what cause s the instruction to be more expensive. When running the simple getpid() and return (integer) functions, thought they’re both one line and doing the same in theory, the fact that the interrupt must be handled and move into kernel space in getpid() causes it to be a lot slower than the procedure call. As we saw with the last version of my function 3 above, when you get the two functions to have equal execution timing, it appears that the procedure call is executing more instruction from the user perspective, even though we know this is false.

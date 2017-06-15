@@ -1,0 +1,29 @@
+Question 1
+Can Unix fork() return an error? Why or why not?
+
+Yes, the fork function can return a -1 if an error occurred. In the event of an error the following happens: the parent will return a -1 and no child process will be created. There are ways for the error flag to be set: 1. number of threads has reached its limit 2. reset on fork flag is not set 3. running out of memory 4. pid init process was terminated 5. fork is not supported on hardware, sys call was interrupted
+
+Question 2
+Why is there no process transition from ready to blocked?
+
+Blocked to ready exists, but not ready to blocked. This is because when a process is blocked it is typically waiting for an event to occur. When said event occurs the process moves to ready. Ready itself means that it could run if the CPU were to execute it. It isn't possible to have a transition from ready to blocked because no interrupts can occur inside the ready phase, which is what is needed to go to the blocked state.
+
+Question 3
+Write down the list of process state transitions that occur during the following C code snippet. You may assume that this is the only process that the CPU is executing.
+int i = 1;
+while (i < 100) { 
+i++; 
+}
+printf("%d ", i);
+while (i > 0) { 
+i--; 
+}
+printf("%d ", i);
+
+
+
+New - the process has just been created
+New - > Ready - the instructions go from being new to put on the ready queue to run 
+Ready - > Running - The first instruction goes from ready to running
+Ready -> Blocked - The other instructions are blocked as the current one is being executed
+Running - > Exit - after all instructions are execute the process exits
